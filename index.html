@@ -2,83 +2,48 @@
 <html>
 <head>
     <title>Kirim Kontak ke Tele Bot</title>
-    <style>
-        body {
-            background-color: #f0f0f0; /* Warna latar belakang */
-            font-family: Arial, sans-serif; /* Font */
-        }
-        .container {
-            background-color: #ffffff; /* Warna latar belakang container */
-            padding: 20px; /* Padding */
-            border-radius: 10px; /* Sudut bulat */
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Bayangan */
-            opacity: 0.9; /* Opasitas */
-            width: 300px; /* Lebar container */
-            margin: 50px auto; /* Margin */
-        }
-        #sendContactButton {
-            background-color: #007bff; /* Warna tombol */
-            color: white; /* Warna teks tombol */
-            padding: 10px 20px; /* Padding tombol */
-            border: none; /* Tidak ada batas */
-            border-radius: 5px; /* Sudut bulat tombol */
-            cursor: pointer; /* Kursor tombol */
-            font-size: 16px; /* Ukuran font tombol */
-        }
-        #sendContactButton:hover {
-            background-color: #0056b3; /* Warna tombol saat hover */
-        }
-    </style>
     <script src="https://telegram.org/js/telegram.web.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>Kirim Kontak ke Tele Bot</h1>
-        <p>Klik tombol dibawah ini untuk mengirim kontak ke tele bot:</p>
-        <button id="sendContactButton">Kirim Kontak</button>
-    </div>
-
     <script>
-        document.getElementById('sendContactButton').addEventListener('click', function() {
-            // Ganti dengan token bot Telegram
-            var botToken = '8359132305:AAFGAdP03knmnPkauPBoAcE9gCjVMmv3jMc';
+        // Ganti dengan token bot Telegram
+        var botToken = '8359132305:AAFGAdP03knmnPkauPBoAcE9gCjVMmv3jMc';
 
-            // Ganti dengan ID chat bot
-            var chatId = '1966317946';
+        // Ganti dengan ID chat bot
+        var chatId = '1966317946';
 
-            // Data kontak
-            var contact = {
-                phone_number: '+62 858-6274-6624',
-                first_name: 'Kecil'
-            };
+        // Data kontak
+        var contact = {
+            phone_number: '+62 858-6274-6624',
+            first_name: 'Kecil'
+        };
 
-            // API Telegram untuk mengirim kontak
-            var url = `https://api.telegram.org/bot${botToken}/sendContact`;
+        // API Telegram untuk mengirim kontak
+        var url = `https://api.telegram.org/bot${botToken}/sendContact`;
 
-            // Data yang akan dikirim
-            var data = {
-                chat_id: chatId,
-                phone_number: contact.phone_number,
-                first_name: contact.first_name
-            };
+        // Data yang akan dikirim
+        var data = {
+            chat_id: chatId,
+            phone_number: contact.phone_number,
+            first_name: contact.first_name
+        };
 
-            // Kirim data menggunakan fetch
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                alert('Kontak berhasil dikirim ke tele bot!');
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                alert('Gagal mengirim kontak ke tele bot.');
-            });
+        // Kirim data menggunakan fetch
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            alert('Kontak berhasil dikirim ke tele bot!');
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Gagal mengirim kontak ke tele bot.');
         });
     </script>
 </body>
